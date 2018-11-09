@@ -24,30 +24,30 @@
 
 import UIKit
 
-open class MessageLabel: UILabel {
+open class MessageLabel: UITextView {
 
     // MARK: - Private Properties
 
-    private lazy var layoutManager: NSLayoutManager = {
-        let layoutManager = NSLayoutManager()
-        layoutManager.addTextContainer(self.textContainer)
-        return layoutManager
-    }()
-
-    private lazy var textContainer: NSTextContainer = {
-        let textContainer = NSTextContainer()
-        textContainer.lineFragmentPadding = 0
-        textContainer.maximumNumberOfLines = self.numberOfLines
-        textContainer.lineBreakMode = self.lineBreakMode
-        textContainer.size = self.bounds.size
-        return textContainer
-    }()
-
-    private lazy var textStorage: NSTextStorage = {
-        let textStorage = NSTextStorage()
-        textStorage.addLayoutManager(self.layoutManager)
-        return textStorage
-    }()
+//    open override lazy var layoutManager: NSLayoutManager = {
+//        let layoutManager = NSLayoutManager()
+//        layoutManager.addTextContainer(self.textContainer)
+//        return layoutManager
+//    }()
+//
+//    open override lazy var textContainer: NSTextContainer = {
+//        let textContainer = NSTextContainer()
+//        textContainer.lineFragmentPadding = 0
+//        textContainer.maximumNumberOfLines = self.numberOfLines
+//        textContainer.lineBreakMode = self.lineBreakMode
+//        textContainer.size = self.bounds.size
+//        return textContainer
+//    }()
+//
+//    open override lazy var textStorage: NSTextStorage = {
+//        let textStorage = NSTextStorage()
+//        textStorage.addLayoutManager(self.layoutManager)
+//        return textStorage
+//    }()
 
     private lazy var rangesForDetectors: [DetectorType: [(NSRange, MessageTextCheckingType)]] = [:]
     
@@ -55,7 +55,7 @@ open class MessageLabel: UILabel {
 
     // MARK: - Public Properties
 
-    open weak var delegate: MessageLabelDelegate?
+    open weak var labelDelegate: MessageLabelDelegate?
 
     open var enabledDetectors: [DetectorType] = [] {
         didSet {
@@ -87,14 +87,14 @@ open class MessageLabel: UILabel {
         }
     }
 
-    open override var lineBreakMode: NSLineBreakMode {
+    open var lineBreakMode: NSLineBreakMode {
         didSet {
             textContainer.lineBreakMode = lineBreakMode
             if !isConfiguring { setNeedsDisplay() }
         }
     }
 
-    open override var numberOfLines: Int {
+    open var numberOfLines: Int {
         didSet {
             textContainer.maximumNumberOfLines = numberOfLines
             if !isConfiguring { setNeedsDisplay() }
@@ -157,10 +157,15 @@ open class MessageLabel: UILabel {
 
     // MARK: - Initializers
 
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        self.lineBreakMode = .byWordWrapping
+        self.numberOfLines = 0
+        super.init(frame: CGRect.zero, textContainer: nil)
+    }
+    public init(frame: CGRect) {
         self.numberOfLines = 0
         self.lineBreakMode = .byWordWrapping
+        super.init(frame: CGRect.zero, textContainer: nil)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -169,7 +174,7 @@ open class MessageLabel: UILabel {
 
     // MARK: - Open Methods
 
-    open override func drawText(in rect: CGRect) {
+    open func drawText(in rect: CGRect) {
 
         let insetRect = UIEdgeInsetsInsetRect(rect, textInsets)
         textContainer.size = CGSize(width: insetRect.width, height: rect.height)
@@ -417,23 +422,23 @@ open class MessageLabel: UILabel {
     }
     
     private func handleAddress(_ addressComponents: [String: String]) {
-        delegate?.didSelectAddress(addressComponents)
+        labelDelegate?.didSelectAddress(addressComponents)
     }
     
     private func handleDate(_ date: Date) {
-        delegate?.didSelectDate(date)
+        labelDelegate?.didSelectDate(date)
     }
     
     private func handleURL(_ url: URL) {
-        delegate?.didSelectURL(url)
+        labelDelegate?.didSelectURL(url)
     }
     
     private func handlePhoneNumber(_ phoneNumber: String) {
-        delegate?.didSelectPhoneNumber(phoneNumber)
+        labelDelegate?.didSelectPhoneNumber(phoneNumber)
     }
     
     private func handleTransitInformation(_ components: [String: String]) {
-        delegate?.didSelectTransitInformation(components)
+        labelDelegate?.didSelectTransitInformation(components)
     }
     
 }

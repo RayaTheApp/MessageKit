@@ -32,7 +32,7 @@ open class TextMessageCell: MessageContentCell {
     /// The `MessageCellDelegate` for the cell.
     open override weak var delegate: MessageCellDelegate? {
         didSet {
-            messageLabel.delegate = delegate
+            messageLabel.labelDelegate = delegate
         }
     }
 
